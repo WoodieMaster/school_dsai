@@ -63,8 +63,14 @@ class Labyrinth:
         cell_height = screen.get_height() / self.__rows
         cell_width = screen.get_width() / self.__cols
         inset = .1
-        if search_state.result is None:
-            return
+
+        result_path = set[Location]()
+        if search_state.result is not None:
+            node = search_state.result
+            while node.parent is not None:
+                result_path.add(node.location)
+                node = node.parent
+
         for row_idx, cols in enumerate(self.__grid):
             for col_idx, cell in enumerate(cols):
                 start_pos_x = col_idx * cell_width + cell_width * inset
@@ -82,12 +88,6 @@ class Labyrinth:
                     color = (0, 255, 255)
                 else:
                     pos = Location(row_idx, col_idx)
-                    result_path = set[Location]()
-                    if search_state.result is not None:
-                        node = search_state.result
-                        while node.parent is not None:
-                            result_path.add(node.location)
-                            node = node.parent
 
                     if pos in result_path:
                         color = (0,255,0)
