@@ -1,18 +1,18 @@
+import math
 import sys
 from collections.abc import Generator
+from typing import Callable
 
 from data import Labyrinth, CellType, Location, Node
-from labyrinth.data import SearchState
+from labyrinth.data import SearchState, NodeStack, NodeQueue
 
 
-def depth_first_search(lab: Labyrinth, start: Node) -> Generator[SearchState]:
-    state = SearchState()
-
-    state.frontiers.appendleft(start)
+def search1(lab: Labyrinth, start: Node, state: SearchState, length_skip: Callable[[],int]) -> Generator[SearchState]:
+    state.frontiers.push(start)
     state.frontier_locations = set[Location]()
 
     while not len(state.frontiers) == 0:
-        curr_len = len(state.frontiers)
+        curr_len = length_skip()
         for _ in range(curr_len):
             # get next node
             current_node = state.frontiers.pop()
@@ -31,21 +31,30 @@ def depth_first_search(lab: Labyrinth, start: Node) -> Generator[SearchState]:
             for neighbor in neighbors:
                 if neighbor not in state.visited_locations and neighbor not in state.frontier_locations:
                     state.frontier_locations.add(neighbor)
-                    state.frontiers.appendleft(Node(neighbor, current_node))
+                    state.frontiers.push(Node(neighbor, current_node))
         yield state
 
     yield state
     return
 
+def depth_first_search(lab: Labyrinth, start: Node) -> Generator[SearchState]:
+    state = SearchState(NodeStack())
+    return search1(lab, start, state, lambda: int(math.sqrt(len(state.frontiers))) + 1)
+
+
+def breadth_first_search(lab: Labyrinth, start: Node) -> Generator[SearchState]:
+    state = SearchState(NodeQueue())
+    return search1(lab, start, state, lambda: len(state.frontiers))
+
 
 def main():
-    rows = 30 if len(sys.argv) < 2 else int(sys.argv[1])
-    cols = 41 if len(sys.argv) < 3 else int(sys.argv[2])
+    rows = 20 if len(sys.argv) < 2 else int(sys.argv[1])
+    cols = 40 if len(sys.argv) < 3 else int(sys.argv[2])
 
     start = Location(0, 0)
     end = Location(rows - 2, cols - 2)
     lab = Labyrinth(rows, cols, .2, start, end)
-    depth_first_search(lab, Node(start, None))
+    breadth_first_search(lab, Node(start, None))
 
 if __name__ == '__main__':
     main()

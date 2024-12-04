@@ -1,14 +1,18 @@
 import typing
+from abc import abstractmethod
 from collections import deque
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from enum import Enum
 import random
+from inspect import stack
 
 import pygame
 from pygame import Surface
-from pygame.display import set_gamma_ramp
 
+background_colour = (0,0,0)
+def clear_window(screen: Surface):
+    screen.fill(background_colour)
 
 @dataclass(frozen=True)
 class Location:
@@ -35,9 +39,53 @@ class Node:
     def __repr__(self) -> str:
         return str(self.location)
 
-class SearchState:
+class FrontierWrapper:
     def __init__(self):
-        self.frontiers = deque[Node]()
+        pass
+
+    @abstractmethod
+    def push(self, value: Node):
+        pass
+
+    @abstractmethod
+    def pop(self):
+        pass
+
+    @abstractmethod
+    def __len__(self):
+        pass
+
+class NodeQueue(FrontierWrapper):
+    def __init__(self):
+        super().__init__()
+        self.__container = deque[Node]()
+
+    def push(self, value: Node):
+        self.__container.append(value)
+
+    def pop(self) -> Node:
+        return self.__container.popleft()
+
+    def __len__(self):
+        return self.__container.__len__()
+
+class NodeStack(FrontierWrapper):
+    def __init__(self):
+        super().__init__()
+        self.__container = list[Node]()
+
+    def push(self, value: Node):
+        self.__container.append(value)
+
+    def pop(self) -> Node:
+        return self.__container.pop()
+
+    def __len__(self):
+        return self.__container.__len__()
+
+class SearchState:
+    def __init__(self, frontier: FrontierWrapper):
+        self.frontiers = frontier
         self.visited_locations = set[Location]()
         self.result: Node | None = None
         self.frontier_locations = set[Node]()
@@ -59,13 +107,14 @@ class Labyrinth:
         self.__fill_with_obstacles()
         pass
 
-    def draw(self, screen: Surface, search_state: SearchState) -> None:
+    def draw(self, screen: Surface, search_state: SearchState | None) -> None:
+        clear_window(screen)
         cell_height = screen.get_height() / self.__rows
         cell_width = screen.get_width() / self.__cols
         inset = .1
 
         result_path = set[Location]()
-        if search_state.result is not None:
+        if search_state is not None and search_state.result is not None:
             node = search_state.result
             while node.parent is not None:
                 result_path.add(node.location)
@@ -86,7 +135,7 @@ class Labyrinth:
                     color = (255, 0, 255)
                 elif cell == CellType.GOAL:
                     color = (0, 255, 255)
-                else:
+                elif search_state is not None:
                     pos = Location(row_idx, col_idx)
 
                     if pos in result_path:
