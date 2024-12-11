@@ -4,7 +4,7 @@ from collections.abc import Generator
 from typing import Callable
 
 from data import Labyrinth, CellType, Location, Node
-from labyrinth.data import SearchState, NodeStack, NodeQueue, NodePrioQueue
+from data import SearchState, NodeStack, NodeQueue, NodePrioQueue
 
 
 def search1(lab: Labyrinth, start: Node, state: SearchState, length_skip: Callable[[],int]) -> Generator[SearchState]:

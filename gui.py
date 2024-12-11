@@ -4,7 +4,7 @@ import pygame
 from pygame import Surface
 
 import algorithms
-from labyrinth.data import Location, Labyrinth, Node, clear_window, SearchState, CellType
+from data import Location, Labyrinth, Node, clear_window, SearchState, CellType
 
 pygame.init()
 
