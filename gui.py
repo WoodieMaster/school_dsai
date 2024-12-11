@@ -1,6 +1,7 @@
 from collections.abc import Callable, Generator
 
 import pygame
+from mistune.plugins.def_list import TRIM_RE
 from pygame import Surface
 
 import algorithms
@@ -37,6 +38,7 @@ class Program:
         self.algorithm: Algorithm | None = None
         self.labyrinth: Labyrinth | None = None
         self.screen = screen
+        self.simulated = True
 
     def draw_labyrinth(self, search_state: SearchState | None) -> None:
         clear_window(self.screen)
@@ -111,6 +113,9 @@ class Program:
                     self.labyrinth = create_labyrinth(LAB_ROWS, LAB_COLS)
                     self.draw_labyrinth(None)
                     return True
+                # Fast-forward
+                elif event.unicode == 'f':
+                    self.simulated = not self.simulated
                 # Quit
                 elif event.unicode == 'q':
                     pygame.quit()
@@ -118,10 +123,12 @@ class Program:
         return False
 
     def run_algorithm(self):
+        self.simulated = True
         for state in (self.algorithm(self.labyrinth, Node(START, None))):
             if self.handle_event():
                 return
-            self.draw_labyrinth(state)
+            if self.simulated or state.result is not None:
+                self.draw_labyrinth(state)
         self.algorithm = None
 
     def run(self):
@@ -138,8 +145,4 @@ def create_labyrinth(rows: int, cols: int) -> Labyrinth:
 
 def main():
     screen = create_window()
-
     Program(screen).run()
-
-if __name__ == '__main__':
-    main()
