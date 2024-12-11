@@ -15,7 +15,8 @@ SCALE = 3
 START = Location(LAB_ROWS // 2, LAB_COLS // 2)
 
 
-search_algorithms: list[tuple[Callable[[Labyrinth, Node], Generator[algorithms.SearchState, None, None]],str]] = [
+type Algorithm = Callable[[Labyrinth, Node], Generator[algorithms.SearchState, None, None]]
+search_algorithms: list[tuple[Algorithm,str]] = [
     (algorithms.breadth_first_search, "Breadth First Search"),
     (algorithms.depth_first_search, "Depth First Search")
 ]
@@ -32,32 +33,40 @@ def create_window() -> Surface:
 def game_loop(screen: Surface):
     clear_window(screen)
 
-    algorithm = None
+    algorithm: Algorithm | None = None
 
-    lab = create_labyrinth(LAB_ROWS, LAB_COLS)
-    while True:
+    def handle_event():
+        nonlocal algorithm, lab
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return
+                exit(1)
 
             if event.type == pygame.KEYDOWN:
                 if len(event.unicode) != 1:
                     continue
-                if ord(event.unicode) in range(ord('0'),ord('9')+1):
+                if ord(event.unicode) in range(ord('1'), ord('9') + 1):
                     lab = create_labyrinth(LAB_ROWS, LAB_COLS)
-                    info = search_algorithms[int(event.unicode)]
+                    algorithm_idx = int(event.unicode) - 1
+                    if algorithm_idx >= len(search_algorithms) or algorithm_idx < 0:
+                        print(f"Invalid algorithm index {algorithm_idx}! Max index: {len(search_algorithms)}")
+                        continue
+                    info = search_algorithms[algorithm_idx]
                     algorithm = info[0]
                     pygame.display.set_caption('Search Algorithms - ' + info[1])
                 elif event.unicode == 'r':
                     lab = create_labyrinth(LAB_ROWS, LAB_COLS)
                     lab.draw(screen, None)
+                elif event.unicode == 'q':
+                    pygame.quit()
+                    exit(1)
+
+    lab = create_labyrinth(LAB_ROWS, LAB_COLS)
+    while True:
+        handle_event()
         if lab is not None and algorithm is not None:
             for state in (algorithm(lab, Node(START, None))):
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        return
+                handle_event()
                 lab.draw(screen, state)
                 # time.sleep(0)
             algorithm = None
