@@ -4,7 +4,7 @@ from collections.abc import Generator
 from typing import Callable
 
 from data import Labyrinth, CellType, Location, Node
-from labyrinth.data import SearchState, NodeStack, NodeQueue
+from labyrinth.data import SearchState, NodeStack, NodeQueue, NodePrioQueue
 
 
 def search1(lab: Labyrinth, start: Node, state: SearchState, length_skip: Callable[[],int]) -> Generator[SearchState]:
@@ -41,10 +41,13 @@ def depth_first_search(lab: Labyrinth, start: Node) -> Generator[SearchState]:
     state = SearchState(NodeStack())
     return search1(lab, start, state, lambda: int(math.sqrt(len(state.frontiers))) + 1)
 
-
 def breadth_first_search(lab: Labyrinth, start: Node) -> Generator[SearchState]:
     state = SearchState(NodeQueue())
     return search1(lab, start, state, lambda: len(state.frontiers))
+
+def a_star_search(lab: Labyrinth, start: Node) -> Generator[SearchState]:
+    state = SearchState(NodePrioQueue(lab.goal()))
+    return search1(lab, start, state, lambda: int(math.sqrt(len(state.frontiers))) + 1)
 
 
 def main():
