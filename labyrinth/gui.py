@@ -131,9 +131,6 @@ class Program:
             if self.labyrinth is not None and self.algorithm is not None:
                 self.run_algorithm()
 
-
-
-
 def create_labyrinth(rows: int, cols: int) -> Labyrinth:
     end = Location(rows - 2, cols - 2)
     return Labyrinth(rows, cols, .2, START, end)
