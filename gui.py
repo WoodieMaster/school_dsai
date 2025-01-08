@@ -1,11 +1,10 @@
 from collections.abc import Callable, Generator
 
 import pygame
-from mistune.plugins.def_list import TRIM_RE
 from pygame import Surface
 
 import algorithms
-from data import Location, Labyrinth, Node, clear_window, SearchState, CellType
+from data import (Location, Labyrinth, Node, SearchState, CellType)
 
 pygame.init()
 
@@ -14,14 +13,12 @@ LAB_COLS = 300
 SCALE = 3
 START = Location(LAB_ROWS // 2, LAB_COLS // 2)
 
+type Algorithm = Callable[[Labyrinth, Node], Generator[SearchState, None, None]]
 
-type Algorithm = Callable[[Labyrinth, Node], Generator[algorithms.SearchState, None, None]]
+background_colour = (0,0,0)
+def clear_window(screen: Surface):
+    screen.fill(background_colour)
 
-algorithm_list: list[tuple[Algorithm,str]] = [
-    (algorithms.breadth_first_search, "Breadth First Search"),
-    (algorithms.depth_first_search, "Depth First Search"),
-    (algorithms.a_star_search, "A Star Search"),
-]
 
 def create_window() -> Surface:
     screen = pygame.display.set_mode((LAB_COLS * SCALE, LAB_ROWS * SCALE))
@@ -86,10 +83,10 @@ class Program:
         if self.labyrinth is None:
             self.labyrinth = create_labyrinth(LAB_ROWS, LAB_COLS)
         algorithm_idx = idx
-        if algorithm_idx >= len(algorithm_list) or algorithm_idx < 0:
-            print(f"Invalid algorithm index {algorithm_idx}! Max index: {len(algorithm_list)}")
+        if algorithm_idx >= len(algorithms.ALGORITHM_LIST) or algorithm_idx < 0:
+            print(f"Invalid algorithm index {algorithm_idx}! Max index: {len(algorithms.ALGORITHM_LIST)}")
             return
-        algorithm, name = algorithm_list[algorithm_idx]
+        algorithm, name = algorithms.ALGORITHM_LIST[algorithm_idx]
         self.algorithm = algorithm
         pygame.display.set_caption('Search Algorithms - ' + name)
 
@@ -146,3 +143,6 @@ def create_labyrinth(rows: int, cols: int) -> Labyrinth:
 def main():
     screen = create_window()
     Program(screen).run()
+
+if __name__ == '__main__':
+    main()

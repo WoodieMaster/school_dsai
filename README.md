@@ -1,14 +1,18 @@
 # Labyrinth
 This is a small python project simulating the solving of a randomly generated labyrinth using different algorithms
 
-## How to use
-run the `__init__.py` file to start the  program
+## Requirements
+- Python3
+- install requirements using `pip install -r requirements.txt`
 
-````bash
-python3 __init__.py
-````
+## Start
+Start the programming by running the `__desktop__.py` file
 
-Once the program is running, the following hotkeys are available
+### Overview
+The program uses pygame to display a window where the algorithms are rendered
+
+### Usage
+Once the program is running, the following hotkeys are available:
 
 | Key | Action                                       |
 |-----|----------------------------------------------|

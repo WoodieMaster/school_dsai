@@ -5,14 +5,6 @@ from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 import heapq
-from logging import lastResort
-
-import pygame
-from pygame import Surface
-
-background_colour = (0,0,0)
-def clear_window(screen: Surface):
-    screen.fill(background_colour)
 
 @dataclass(frozen=True)
 class Location:
@@ -25,7 +17,7 @@ class CellType(Enum):
     - class representing a cell
     """
     EMPTY = ' '
-    OBSTACLE = '■'
+    OBSTACLE = '#'
     START = 'S'
     GOAL = 'G'
     PATH = '*'

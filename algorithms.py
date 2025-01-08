@@ -1,11 +1,9 @@
 import math
 import sys
-from collections.abc import Generator
-from typing import Callable
+from collections.abc import Generator, Callable
 
 from data import Labyrinth, CellType, Location, Node
 from data import SearchState, NodeStack, NodeQueue, NodePrioQueue
-
 
 def search1(lab: Labyrinth, start: Node, state: SearchState, length_skip: Callable[[],int]) -> Generator[SearchState]:
     state.frontiers.push(start)
@@ -58,6 +56,12 @@ def main():
     end = Location(rows - 2, cols - 2)
     lab = Labyrinth(rows, cols, .2, start, end)
     breadth_first_search(lab, Node(start, None))
+
+ALGORITHM_LIST: list[tuple[Callable[[Labyrinth, Node], Generator[SearchState, None, None]],str]] = [
+    (breadth_first_search, "Breadth First Search"),
+    (depth_first_search, "Depth First Search"),
+    (a_star_search, "A* Search"),
+]
 
 if __name__ == '__main__':
     main()
