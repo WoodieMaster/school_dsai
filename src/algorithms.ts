@@ -1,9 +1,9 @@
 import {AlgorithmNode, CellType, Labyrinth, SearchState, NodeStack, NodePrioQueue, PositionSet} from "./data"
 import {Queue} from "@datastructures-js/queue";
 
-export type SearchResult = Generator<SearchState, undefined, undefined>;
+export type LabyrinthSolver = Generator<SearchState, undefined, undefined>;
 
-function* base_search(lab: Labyrinth, start: AlgorithmNode, state: SearchState, length_skip: () => number): SearchResult {
+function* base_search(lab: Labyrinth, start: AlgorithmNode, state: SearchState, length_skip: () => number): LabyrinthSolver {
     state.frontiers.push(start);
     state.frontier_positions = new PositionSet();
 
@@ -39,24 +39,24 @@ function* base_search(lab: Labyrinth, start: AlgorithmNode, state: SearchState, 
     return;
 }
 
-export function depth_first_search(lab: Labyrinth, start: AlgorithmNode): SearchResult  {
+export function depth_first_search(lab: Labyrinth, start: AlgorithmNode): LabyrinthSolver  {
     const state = new SearchState(new NodeStack())
 
     return base_search(lab, start, state, () => Math.floor(Math.sqrt(state.frontiers.size()))+1)
 }
 
-export function breadth_first_search(lab: Labyrinth, start: AlgorithmNode): SearchResult {
+export function breadth_first_search(lab: Labyrinth, start: AlgorithmNode): LabyrinthSolver {
     const state = new SearchState(new Queue())
 
     return base_search(lab, start, state, () => state.frontiers.size());
 }
 
-export function a_star_search(lab: Labyrinth, start: AlgorithmNode): SearchResult {
+export function a_star_search(lab: Labyrinth, start: AlgorithmNode): LabyrinthSolver {
     const state = new SearchState(new NodePrioQueue(lab.goal));
     return base_search(lab, start, state, () => Math.floor(Math.sqrt(state.frontiers.size()))+1);
 }
 
-export type AlgorithmFunction = (lab: Labyrinth, start: AlgorithmNode) => SearchResult
+export type AlgorithmFunction = (lab: Labyrinth, start: AlgorithmNode) => LabyrinthSolver
 export type AlgorithmList = [AlgorithmFunction, string][]
 
 export const ALGORITHM_LIST: AlgorithmList = [
